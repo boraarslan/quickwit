@@ -680,7 +680,7 @@ mod tests {
         let rest_search_stream_api_handler =
             super::search_stream_handler(Some(Arc::new(mock_search_service))).recover(recover_fn);
         let response = warp::test::request()
-            .path("/my-index/search/stream?query=obama&fast_field=external_id&output_format=csv")
+            .path("/my-index/search/stream?query=obama&fast_field=external_id&output_format=Csv")
             .reply(&rest_search_stream_api_handler)
             .await;
         assert_eq!(response.status(), 200);
@@ -692,7 +692,7 @@ mod tests {
     #[tokio::test]
     async fn test_rest_search_stream_api_csv() {
         let (index, req) = warp::test::request()
-            .path("/my-index/search/stream?query=obama&fast_field=external_id&output_format=csv")
+            .path("/my-index/search/stream?query=obama&fast_field=external_id&output_format=Csv")
             .filter(&super::search_stream_filter())
             .await
             .unwrap();
@@ -716,7 +716,7 @@ mod tests {
         let (index, req) = warp::test::request()
             .path(
                 "/my-index/search/stream?query=obama&fast_field=external_id&\
-                 output_format=clickHouseRowBinary",
+                 output_format=ClickHouseRowBinary",
             )
             .filter(&super::search_stream_filter())
             .await
@@ -749,7 +749,7 @@ mod tests {
         let parse_error = rejection.find::<serde_qs::Error>().unwrap();
         assert_eq!(
             parse_error.to_string(),
-            "unknown variant `click_house_row_binary`, expected `csv` or `clickHouseRowBinary`"
+            "unknown variant `click_house_row_binary`, expected `Csv` or `ClickHouseRowBinary`"
         );
     }
 
@@ -757,7 +757,7 @@ mod tests {
     async fn test_rest_search_stream_api_error_empty_fastfield() {
         let rejection = warp::test::request()
             .path(
-                "/my-index/search/stream?query=obama&fast_field=&output_format=clickHouseRowBinary",
+                "/my-index/search/stream?query=obama&fast_field=&output_format=ClickHouseRowBinary",
             )
             .filter(&super::search_stream_filter())
             .await

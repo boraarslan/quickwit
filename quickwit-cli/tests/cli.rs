@@ -797,7 +797,7 @@ async fn test_all_local_index() -> Result<()> {
     assert_eq!(result["num_hits"], Value::Number(Number::from(2i64)));
 
     let search_stream_response = reqwest::get(format!(
-        "http://127.0.0.1:{}/api/v1/{}/search/stream?query=level:info&output_format=csv&fast_field=ts",
+        "http://127.0.0.1:{}/api/v1/{}/search/stream?query=level:info&output_format=Csv&fast_field=ts",
         test_env.rest_listen_port,
         test_env.index_id
     ))
