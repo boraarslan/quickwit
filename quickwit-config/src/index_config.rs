@@ -33,6 +33,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::config::deser_valid_uri;
 use crate::source_config::SourceConfig;
+use crate::validate_identifier;
 
 // Note(fmassot): `DocMapping` is a struct only used for
 // serialization/deserialization of `DocMapper` parameters.
@@ -277,15 +278,15 @@ impl IndexConfig {
             .collect()
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
+    pub fn validate(&self) -> anyhow::Result<()> {
+        validate_identifier("Index ID", &self.index_id)?;
+
         if self.sources.len() > self.sources().len() {
             bail!("Index config contains duplicate sources.")
         }
-
         for source in self.sources.iter() {
             source.validate()?;
         }
-
         // Validation is made by building the doc mapper.
         // Note: this needs a deep refactoring to separate the doc mapping configuration,
         // and doc mapper implementations.
@@ -294,7 +295,6 @@ impl IndexConfig {
             &self.search_settings,
             &self.indexing_settings,
         )?;
-
         if self.indexing_settings.merge_policy.max_merge_factor
             < self.indexing_settings.merge_policy.merge_factor
         {
@@ -303,7 +303,6 @@ impl IndexConfig {
                  `merge_factor`."
             )
         }
-
         Ok(())
     }
 }

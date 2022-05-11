@@ -2689,6 +2689,7 @@ dependencies = [
  "once_cell",
  "quickwit-common",
  "quickwit-doc-mapper",
+ "regex",
  "serde",
  "serde_json",
  "serde_yaml",
