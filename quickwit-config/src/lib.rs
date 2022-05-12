@@ -36,6 +36,7 @@ pub use index_config::{
 pub use source_config::{
     FileSourceParams, KafkaSourceParams, KinesisSourceParams, PushApiSourceParams,
     RegionOrEndpoint, SourceConfig, SourceParams, VecSourceParams, VoidSourceParams,
+    CLI_INGEST_SOURCE_ID,
 };
 
 fn validate_identifier(label: &str, value: &str) -> anyhow::Result<()> {

@@ -27,6 +27,9 @@ use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::validate_identifier;
 
+/// Reserved source ID for the `quickwit index ingest` CLI command.
+pub const CLI_INGEST_SOURCE_ID: &str = ".cli-ingest-source";
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SourceConfig {
     pub source_id: String,
@@ -87,8 +90,9 @@ impl SourceConfig {
     ///
     /// TODO refactor #1065
     pub fn validate(&self) -> anyhow::Result<()> {
-        validate_identifier("Source ID", &self.source_id)?;
-
+        if self.source_id != CLI_INGEST_SOURCE_ID {
+            validate_identifier("Source ID", &self.source_id)?;
+        }
         match &self.source_params {
             // We want to forbid source_config with no filepath
             SourceParams::File(file_params) => {
