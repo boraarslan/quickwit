@@ -20,6 +20,8 @@
 // TODO: Remove when `KinesisSource` is fully implemented.
 #![allow(dead_code)]
 
+use quickwit_storage::object_storage::error::RusotoErrorWrapper;
+use quickwit_storage::retry::retry;
 use rusoto_kinesis::{
     GetRecordsInput, GetRecordsOutput, GetShardIteratorInput, Kinesis, KinesisClient,
     ListShardsInput, Shard,
@@ -38,7 +40,14 @@ pub(crate) async fn get_records(
     // TODO: Implement retry.
     // TODO: Return an error other than `anyhow::Error` so that expired shard iterators can be
     // handled properly.
-    let response = kinesis_client.get_records(request).await?;
+    let response = retry(|| async {
+        kinesis_client
+            .get_records(request.clone())
+            .await
+            .map_err(RusotoErrorWrapper::from)
+    })
+    .await?;
+
     Ok(response)
 }
 
