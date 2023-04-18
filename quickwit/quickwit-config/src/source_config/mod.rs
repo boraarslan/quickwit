@@ -18,6 +18,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 pub(crate) mod serialize;
+mod source_format;
 
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
@@ -38,6 +39,8 @@ use vrl::diagnostic::Formatter;
 use vrl::{CompilationResult, Program, TimeZone};
 
 use crate::TestableForRegression;
+
+use self::source_format::SourceFormat;
 
 /// Reserved source ID for the `quickwit index ingest` CLI command.
 pub const CLI_INGEST_SOURCE_ID: &str = "_ingest-cli-source";
@@ -75,6 +78,9 @@ pub struct SourceConfig {
     pub enabled: bool,
 
     pub source_params: SourceParams,
+
+    /// Data format which the source sends. Defaults to JSON.
+    pub source_format: SourceFormat,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "transform")]
@@ -118,6 +124,7 @@ impl SourceConfig {
             desired_num_pipelines: NonZeroUsize::new(1).unwrap(),
             enabled: true,
             source_params: SourceParams::IngestApi,
+            source_format: SourceFormat::Json,
             transform_config: None,
         }
     }
@@ -130,6 +137,7 @@ impl SourceConfig {
             desired_num_pipelines: NonZeroUsize::new(1).unwrap(),
             enabled: true,
             source_params: SourceParams::IngestCli,
+            source_format: SourceFormat::Json,
             transform_config: None,
         }
     }
@@ -142,6 +150,7 @@ impl SourceConfig {
             desired_num_pipelines: NonZeroUsize::new(1).unwrap(),
             enabled: true,
             source_params,
+            source_format: SourceFormat::Json,
             transform_config: None,
         }
     }
@@ -160,6 +169,7 @@ impl TestableForRegression for SourceConfig {
                 client_params: serde_json::json!({}),
                 enable_backfill_mode: false,
             }),
+            source_format: SourceFormat::Json,
             transform_config: Some(TransformConfig {
                 vrl_script: ".message = downcase(string!(.message))".to_string(),
                 timezone_opt: None,
